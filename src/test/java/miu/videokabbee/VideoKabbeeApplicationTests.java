@@ -66,39 +66,48 @@ class VideoKabbeeApplicationTests {
 		user.setContact(new Contact()); // Initialize the Contact object
 		user.getContact().setEmail("testuser@test.com");
 		user.setPassword("testpassword");
+		user.setUserName("Tes");
 
 		String encodedPassword = "encodedPassword";
-		User registeredUser = new User();
-		registeredUser.setId(1L);
-		registeredUser.setFirstName(user.getFirstName());
-		registeredUser.setContact(new Contact()); // Initialize the Contact object
-		registeredUser.getContact().setEmail(user.getContact().getEmail());
-		registeredUser.setPassword(encodedPassword);
+		user.setPassword(encodedPassword);
 
 		when(passwordEncoder.encode(user.getPassword())).thenReturn(encodedPassword);
-		when(userService.register(any(User.class))).thenReturn(registeredUser);
+		when(userService.register(user)).thenReturn("Success");
+
 
 		ResponseEntity<?> response = userController.registerUser(user);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(registeredUser, response.getBody());
+
 	}
 
 	@Test
-	void registerUser_returnsNotFoundForInvalidRegistration() {
+	void InvalidaUserName() {
 		User user = new User();
 		user.setFirstName("Test User");
 		user.setContact(new Contact());
 		user.getContact().setEmail("testuser@test.com");
 		user.setPassword("testpassword");
+		user.setUserName("Tes");
 
-		when(userService.register(any(User.class))).thenReturn(null);
-
-		ResponseEntity<?> response = userController.registerUser(user);
-
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertEquals(new ExceptionHandling("not Registered"), response.getBody());
+		when(userService.register(user)).thenReturn("Username-taken");
+		assertEquals("Username-taken".length(), userService.register(user).length());
 	}
 
+
+
+
+	@Test
+	void InvalidUserEmail() {
+		User user = new User();
+		user.setFirstName("Test User");
+		user.setContact(new Contact());
+		user.getContact().setEmail("testuser@test.com");
+		user.setPassword("testpassword");
+		user.setUserName("Tes");
+
+		when(userService.register(user)).thenReturn("Email-taken");
+		assertEquals("Email-taken".length(), userService.register(user).length());
+	}
 }
 

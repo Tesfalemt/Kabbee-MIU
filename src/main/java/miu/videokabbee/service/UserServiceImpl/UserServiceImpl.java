@@ -13,12 +13,19 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserInterfaceService {
 
     @Autowired
-  UserRepository userRepository;
+    UserRepository userRepository;
 
 
 
-    public User register(User user) {
-     return  userRepository.save(user);
+    public String register(User user) {
+        if(userRepository.existsByContact_Email(user.getContact().getEmail())){
+            return "Email-taken";
+        } else if (userRepository.existsByUserName(user.getUserName())) {
+            return "Username-taken";
+
+        }
+        userRepository.save(user);
+        return "Success";
     }
 
 

@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class UserController {
 
-   private final UserServiceImpl userInterfaceService;
-   private final PasswordEncoder passwordEncoder;
+    private final UserServiceImpl userInterfaceService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserByID(@PathVariable("id") Long id ){
@@ -36,10 +36,10 @@ public class UserController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody User user){
         String encodedPassword=passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-     var userRegistered =   userInterfaceService.register(user);
+        var userRegistered =   userInterfaceService.register(user);
 
-        if (userRegistered == null) {
-            return new ResponseEntity<>(new ExceptionHandling("not Registered"), HttpStatus.NOT_FOUND);
+        if (userRegistered.equals("Username-taken") ||userRegistered.equals("Email-taken")  ) {
+            return new ResponseEntity<>(new ExceptionHandling(userRegistered), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(userRegistered,HttpStatus.OK);
     }
