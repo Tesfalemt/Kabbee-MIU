@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 import miu.videokabbee.ExceptionHandling.ExceptionHandling;
-import miu.videokabbee.domain.User;
+import miu.videokabbee.domain.Users;
 import miu.videokabbee.service.UserServiceImpl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,15 +33,20 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User user){
-        String encodedPassword=passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-     var userRegistered =   userInterfaceService.register(user);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody Users users){
+        String encodedPassword=passwordEncoder.encode(users.getPassword());
+        users.setPassword(encodedPassword);
+     var userRegistered =   userInterfaceService.register(users);
 
-        if (userRegistered == null) {
-            return new ResponseEntity<>(new ExceptionHandling("not Registered"), HttpStatus.NOT_FOUND);
+        if (userRegistered.equals("Username-taken") ||userRegistered.equals("Email-taken")  ) {
+            return new ResponseEntity<>(new ExceptionHandling(userRegistered), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(userRegistered,HttpStatus.OK);
+    }
+
+    @GetMapping("/logIn")
+    public String login(){
+        return "LoggedIn";
     }
 
 }
